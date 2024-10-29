@@ -1,0 +1,85 @@
+.main-body {
+    background-color: black;
+    border-radius: 20px;
+    padding-bottom: 20px;
+    margin-left: 30px;
+    margin-right: 30px;
+    box-shadow: 0 5px 15px rgb(207, 207, 207);
+    transition: box-shadow 0.3s ease-in-out;
+  }
+  
+  .main-body:hover {
+    box-shadow: 0 10px 20px rgb(255, 255, 255);
+  }
+  
+  body {
+    background-color: rgb(85, 85, 85);
+    padding-top: 15px;
+  }
+  
+  h1 {
+    color: #919191;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 0 3px 60px rgb(255, 255, 255);
+    transition: text-shadow 0.3s ease-in-out;
+    font-size: 24px;
+    padding-top: 20px;
+    font-family: "Sedgwick Ave Display", cursive;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  h1:hover {
+    color: #fff;
+    text-shadow: 0 0 7px #fff, 0 0 10px #fff, 0 0 21px #fff, 0 0 42px #0fa,
+      0 0 82px #0fa, 0 0 92px #0fa, 0 0 102px #0fa, 0 0 151px #0fa;
+  }
+  
+  .radio-button {
+    color: white;
+    margin-left: 40%;
+  }
+  
+  #file-input-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  canvas {
+    display: block;
+    border-radius: 20px;
+    margin: 20px;
+    /* background: radial-gradient(circle, rgb(29, 29, 29) 0%, rgb(0, 0, 0) 100%); */
+    background-color: black;
+    box-shadow: 0 2px 10px rgb(255, 255, 255);
+    transition: box-shadow 0.3s ease-in-out;
+  }
+  
+  canvas:hover {
+    box-shadow: 0 5px 15px rgb(254, 119, 119);
+    /* background: radial-gradient(circle, rgb(26, 26, 26) 0%, rgb(0, 0, 0) 100%); */
+    background-color: black;
+  }
+  
+  .file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    margin-left: 40%;
+  }
+  
+  .file-input-wrapper input[type="file"] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+  }
+  

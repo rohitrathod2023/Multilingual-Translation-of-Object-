@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection</title>
+    <link rel="stylesheet" href="/static/css/style2.css">
+    <!-- <style>
+
+
+        canvas {
+            display:block;
+            border: 1px solid black;
+            margin-top:10px;
+            background-color: rgba(49, 48, 48, 0.122);
+            margin-left: 40%;
+       }
+
+       .button {
+            margin-left: 40%;
+       }
+
+       body{
+        background-color: rgba(128, 128, 128, 0.592);
+       }
+
+       h1 {
+            color: #c40b0b;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 24px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            margin-left: 40%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+        }
+
+        #file-input-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style> -->
+</head>
+<body>
+    <div class="main-body">
+        <h1>Object Detector and Translator</h1>
+        
+        <!-- <p id="abc"></p>
+        <p id="abcd"></p> -->
+        
+        <!-- <div id="data-container"></div> -->
+        <div class="radio-button">
+            <input type="radio" id="english" name="language" value="english" required>
+            <label for="english">English</label>
+            <br>
+            <input type="radio" id="marathi" name="language" value="marathi" required>
+            <label for="marathi">Marathi</label>
+            <br>
+            <input type="radio" id="japanese" name="language" value="japanese" required>
+            <label for="japanese">Japanese</label>
+            <br>
+            <input type="radio" id="french" name="language" value="french" required>
+            <label for="french">French</label>
+        </div>
+        <div class="file-input-wrapper">
+            <input type="file" id="fileInput" name="fileInput" />
+            <label for="fileInput" id="file-input-button">Choose File</label>
+        </div>
+
+        <canvas></canvas>
+        <!-- <div id="data-container"></div>
+        <h1 id="a12"></h1>
+        <h2 id="ret"></h2> -->
+
+        <script>
+            const input = document.getElementById("fileInput");
+            const languageRadioButtons = document.getElementsByName("language");
+
+            input.addEventListener("change", async (event) => {
+                const file = event.target.files[0];
+                const data = new FormData();
+                data.append("image_file", file, "image_file");
+                const response = await fetch("/detect", {
+                    method: "post",
+                    body: data
+                });
+                const boxes = await response.json();
+                const selectedLanguage = getSelectedLanguage();
+                // document.getElementById("abc").innerHTML=selectedLanguage;
+                draw_image_and_boxes(file, boxes, selectedLanguage);
+            });
+
+            // function draw_image_and_boxes(file, boxes, selectedLanguage) {
+            //     const img = new Image()
+            //     img.src = URL.createObjectURL(file);
+            //     img.onload = () => {
+            //         const canvas = document.querySelector("canvas");
+            //         canvas.width = img.width;
+            //         canvas.height = img.height;
+            //         const ctx = canvas.getContext("2d");
+            //         ctx.drawImage(img, 0, 0);
+            //         ctx.strokeStyle = "#00FF00";
+            //         ctx.lineWidth = 3;
+            //         ctx.font = "18px serif";
+            //         boxes.forEach(([x1, y1, x2, y2, label]) => {
+            //             lbl = translateLabel(label, selectedLanguage);
+            //             document.getElementById("abcd").innerHTML=label;
+            //             // l = translateLabel(Label1, language);
+            //             ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+            //             ctx.fillStyle = "#00ff00";
+            //             const width = ctx.measureText(lbl).width;
+            //             ctx.fillRect(x1, y1, width + 10, 25);
+            //             ctx.fillStyle = "#000000";
+            //             // document.getElementById("abcd").innerHTML=Label1;
+            //             ctx.fillText(lbl, x1, y1 + 18);
+            //         });
+            //     }
+            // }
+            function draw_image_and_boxes(file, boxes, selectedLanguage) {
+                const img = new Image()
+                img.src = URL.createObjectURL(file);
+                img.onload = () => {
+                    const canvas = document.querySelector("canvas");
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+                    ctx.strokeStyle = "#00FF00";
+                    ctx.lineWidth = 3;
+                    ctx.font = "18px serif";
+                    boxes.forEach(async ([x1, y1, x2, y2, label]) => {
+                        const translatedLabel = await translateLabel(label, selectedLanguage);
+                        // document.getElementById("abcd").innerHTML = label;
+                        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+                        ctx.fillStyle = "#00ff00";
+                        const width = ctx.measureText(translatedLabel).width;
+                        ctx.fillRect(x1, y1, width + 10, 25);
+                        ctx.fillStyle = "#000000";
+                        ctx.fillText(translatedLabel, x1, y1 + 18);
+                    });
+                }
+            }
+
+            function getSelectedLanguage() {
+                for (let i = 0; i < languageRadioButtons.length; i++) {
+                    if (languageRadioButtons[i].checked) {
+                        return languageRadioButtons[i].value;
+                    }
+                }
+                return "english"; // Default to English if no language is selected
+            }
+
+            // function translateLabel(label, language) {
+            //     var l = label;
+            //     var lang = language;
+            //     // Use AJAX to send data to the Python server
+            //     var xhr = new XMLHttpRequest();
+            //     xhr.open("POST", "/receive_data", true);
+            //     xhr.setRequestHeader("Content-Type", "application/json");
+
+            //     xhr.onreadystatechange = function() {
+            //         if (xhr.readyState === XMLHttpRequest.DONE) {
+            //             if (xhr.status === 200) {
+            //                 // Parse the response from the server
+            //                 var responseData = JSON.parse(xhr.responseText);
+
+            //                 // Display the translated label in the HTML file
+            //                 // document.getElementById('data-container').innerHTML += responseData.translatedLabel ;
+            //                 text = responseData.translatedLabel;
+            //                 document.getElementById('data-container').innerHTML += text;
+            //             } else {
+            //                 console.error('Error receiving data from Python.');
+            //             }
+            //             document.getElementById("a12").innerHTML=text;
+                        
+            //         }
+            //     };
+            //     // Send JSON data to the Python server
+            //     xhr.send(JSON.stringify({ data1: l ,data2: lang}));
+            //     ret = document.getElementById("a12").value;
+            //     document.getElementById("ret").innerHTML=ret;
+            //     // document.getElementById("a12").innerHTML=text;  no output
+            //     return "トラック";
+                
+                
+                
+            // }
+            async function translateLabel(label, language) {
+                return new Promise((resolve, reject) => {
+                    var l = label;
+                    var lang = language;
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", "/receive_data", true);
+                    xhr.setRequestHeader("Content-Type", "application/json");
+
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                            if (xhr.status === 200) {
+                                var responseData = JSON.parse(xhr.responseText);
+                                resolve(responseData.translatedLabel);
+                            } else {
+                                console.error('Error receiving data from Python.');
+                                reject('Error receiving data from Python.');
+                            }
+                        }
+                    };
+
+                    xhr.send(JSON.stringify({ data1: l, data2: lang }));
+                });
+            }
+            
+
+            // Add event listeners for radio buttons
+            languageRadioButtons.forEach((radioButton) => {
+                radioButton.addEventListener("change", () => {
+                    const fileInput = document.getElementById("fileInput");
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        const selectedLanguage = getSelectedLanguage();
+                        draw_image_and_boxes(file, [], selectedLanguage); // Call with empty boxes
+                    }
+                });
+            });
+
+
+            
+        </script>
+    </div>
+</body>
+</html>
+<!--http://localhost:8080/-->
+
+
